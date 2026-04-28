@@ -1,0 +1,14 @@
+{
+    "parser": "@babel/eslint-parser",
+    "rules": {
+        "max-len": [1, 150, 2, { "ignoreComments": true }],
+        "semi": "error",
+        "indent": ["error", 4],
+        "quotes": ["error", "single", { "avoidEscape": true }]
+    },
+    "env": {
+        "browser": true,
+        "es2024": true
+    },
+    "extends": ["eslint:recommended"]
+}
