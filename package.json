@@ -1,7 +1,7 @@
 {
-    "name": "webpack-config",
+    "name": "todo-mvc-application",
     "version": "1.0.0",
-    "description": "",
+    "description": "TodoMVC-style application: TypeScript, Handlebars, SCSS, Webpack, and RxJS.",
     "private": true,
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,15 +13,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Yeison0416/webpack-config.git"
+        "url": "git+https://github.com/Yeison0416/todo-mvc-application.git"
     },
     "keywords": [],
     "author": "Yeison Steven Sanchez Figueroa",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/Yeison0416/webpack-config/issues"
+        "url": "https://github.com/Yeison0416/todo-mvc-application/issues"
     },
-    "homepage": "https://github.com/Yeison0416/webpack-config#readme",
+    "homepage": "https://github.com/Yeison0416/todo-mvc-application#readme",
     "devDependencies": {
         "@babel/core": "^7.24.7",
         "@babel/eslint-parser": "^7.24.8",
