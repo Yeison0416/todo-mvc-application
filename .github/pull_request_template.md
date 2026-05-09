@@ -2,8 +2,8 @@
 
 ## Tasks to check
 
--   [] Unit tests passed
--   [] Lint passed
+- [] Unit tests passed
+- [] Lint passed
 
 ## Screenshots
 
