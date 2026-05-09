@@ -3,3 +3,6 @@ node_modules/
 dist/*.js
 dist/
 coverage/
+
+# Personal notes — keep local only (never commit)
+docs/PERSONAL_DEVELOPMENT_WORKFLOW.md

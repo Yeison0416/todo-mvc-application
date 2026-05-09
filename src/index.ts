@@ -1,6 +1,6 @@
 import 'reset-css';
 import './index.scss';
 
-import { mountPlaceholderDemo } from './ui/welcome';
+import { mountPlaceholderDemo } from './app/ui/welcome';
 
 mountPlaceholderDemo(document);
