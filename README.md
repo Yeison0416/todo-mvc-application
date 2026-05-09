@@ -1,6 +1,8 @@
-# Webpack Config TypeScript Starter
+# Todo MVC Application
 
-A professional starter project for **TypeScript**, **Handlebars**, and **SCSS/SASS** applications using **Webpack** as the bundler. This setup provides a modular, maintainable, and modern frontend workflow ready for development and production.
+A **TodoMVC-style** frontend built with **TypeScript**, **Handlebars**, **SCSS**, **Webpack**, and **RxJS**. Repository: [Yeison0416/todo-mvc-application](https://github.com/Yeison0416/todo-mvc-application).
+
+This project grew out of a Webpack + TypeScript starter; see `DESIGN_GUIDE.md` for architecture and engineering goals.
 
 ---
 
@@ -50,7 +52,3 @@ import template from './templates/my-template.hbs';
 const html = template({ key: 'value' });
 document.body.innerHTML = html;
 ```
-
-
-
-
