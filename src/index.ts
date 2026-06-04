@@ -1,6 +1,17 @@
 import 'reset-css';
-import './index.scss';
+import './main.scss';
 
-import { mountPlaceholderDemo } from './ui/welcome';
+import { ToDoApp } from './app/to-do-app';
+import { toDodata } from './data/data';
 
-mountPlaceholderDemo(document);
+function App() {
+    return {
+        run() {
+            const appRoot: HTMLElement = document.getElementById('app-root') as HTMLElement;
+            const toDoApp = ToDoApp(appRoot, toDodata.toDo);
+        },
+    };
+}
+
+const app = App();
+app.run();

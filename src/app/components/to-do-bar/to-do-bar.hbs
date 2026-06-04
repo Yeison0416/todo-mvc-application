@@ -1,0 +1,11 @@
+<div class='to-do-bar'>
+    <span class='to-do-bar__status'>{{toDoStatus.text}}</span>
+    <ul class='to-do-bar__list'>
+        <li class='to-do-bar__anchor-filter'>
+            {{#each toDoAnchorfilters}}
+                <a href={{href}} class='to-do-bar__anchor-filter'>{{text}}</a>
+            {{/each}}
+        </li>
+    </ul>
+    <button class='to-do-bar__clear-completed-button'>{{toDoClearCompletedButton.text}}</button>
+</div>

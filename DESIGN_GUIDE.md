@@ -26,6 +26,34 @@ This project is a TodoMVC-style application designed to demonstrate advanced sof
 
 - Components never modify state directly. They receive state from the store and render it. Only the controller triggers state changes through the service. This prevents unpredictable state mutations and makes the app easier to debug.
 
+### Layout & CSS (BEM)
+
+- **BEM (Block Element Modifier)** is the naming convention for layout and styling across the UI. Follow it as consistently as possible.
+- **Block:** A standalone UI piece—typically one block per component (e.g., `todo-header`, `todo-item`, `todo-footer`).
+- **Element:** A part of a block that has no meaning on its own (e.g., `todo-header__title`, `todo-item__checkbox`).
+- **Modifier:** A variant or state of a block or element (e.g., `todo-item--completed`, `todo-footer__filter--active`).
+- **Component alignment:** Each component folder owns one BEM block. Elements and modifiers for that block live in the component’s SCSS and Handlebars template.
+- **Templates:** Handlebars outputs explicit BEM class names. Presentation layer only—controllers and services do not depend on CSS naming.
+- **SCSS:** Use flat BEM selectors with SCSS nesting (`&__element`, `&--modifier`). Avoid deep chains and generic class names (e.g., `.active`, `.selected`).
+- **Guidelines:**
+    - Do not nest elements (`block__element__subelement`); use a new block or flatten the structure.
+    - Prefer modifiers for state (e.g., `--completed`) over styling arbitrary DOM structure.
+    - If an element is reused outside its block, consider promoting it to its own block.
+
+### Semantic HTML
+
+- When building layout structure in Handlebars templates, use **semantic HTML** that reflects the meaning and role of each part of the application—not generic wrappers.
+- Choose tags based on **what the content is**, not how it looks. Styling belongs in SCSS (BEM classes), not in non-semantic markup choices.
+- **Guidelines:**
+    - Use landmarks where appropriate: `header`, `main`, `footer`, `nav`, `section`.
+    - Use `h1`–`h6` for headings in logical order; one primary heading per view when it fits the UI.
+    - Use `form`, `label`, and `input`/`button` for user input—not `div` click targets for actions that are forms or buttons.
+    - Use `ul`/`ol` and `li` for lists of todos; use `button` or `a` for filters and actions according to their behavior.
+    - Prefer `button` for in-page actions; use `a` only when navigation to a URL is intended.
+    - Avoid `div`/`span` soup when a semantic element already expresses the structure.
+- **Component alignment:** Each component template should output markup that a reader (or screen reader) can understand without relying on class names alone.
+- **BEM + semantics:** BEM classes handle styling hooks; semantic tags handle document structure. Use both together—e.g., `<header class="todo-header">`, `<ul class="todo-list">`.
+
 ### Layered & Clean Architecture
 
 - **Presentation (Components):** Render UI, receive state via props/observables, never mutate state directly.
@@ -102,8 +130,8 @@ This project is a TodoMVC-style application designed to demonstrate advanced sof
 
 ## Code Style & Quality
 
-- Follows the style and conventions discussed (modular, functional, reactive, SOLID, etc.).
-- Consistent naming conventions, especially for observables (`$` suffix).
+- Follows the style and conventions discussed (modular, functional, reactive, SOLID, BEM, semantic HTML, etc.).
+- Consistent naming conventions, especially for observables (`$` suffix), CSS classes (BEM), and meaningful HTML tags in templates.
 - Linting and formatting tools (e.g., ESLint, Prettier) are recommended for further quality enforcement.
 
 ---
@@ -117,7 +145,8 @@ This project is a TodoMVC-style application designed to demonstrate advanced sof
 
 ## Accessibility
 
-- Not a focus for this project; the primary goal is code quality and advanced engineering practices.
+- Full accessibility compliance is not a focus for this project; the primary goal is code quality and advanced engineering practices.
+- Semantic HTML (see **Layout & CSS** above) is still required—it improves structure, maintainability, and leaves room for accessibility work later without markup rewrites.
 
 ---
 
