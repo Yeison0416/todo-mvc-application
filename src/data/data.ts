@@ -1,6 +1,6 @@
 import { ToDo } from '../app/types/types';
 
-export const toDodata: { toDo: ToDo } = {
+export const toDoData: { toDo: ToDo } = {
     toDo: {
         type: 'to-do',
         toDoAnchorHeader: {
@@ -14,11 +14,11 @@ export const toDodata: { toDo: ToDo } = {
         },
         toDoBar: {
             type: 'to-do-bar',
-            toDoAnchorfilters: [
+            toDoAnchorFlters: [
                 {
                     type: 'to-do-anchor-filter',
                     text: 'All',
-                    href: '#',
+                    href: '#/',
                 },
                 {
                     type: 'to-do-anchor-filter',

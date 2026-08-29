@@ -29,8 +29,8 @@ This project is a TodoMVC-style application designed to demonstrate advanced sof
 ### Layout & CSS (BEM)
 
 - **BEM (Block Element Modifier)** is the naming convention for layout and styling across the UI. Follow it as consistently as possible.
-- **Block:** A standalone UI piece—typically one block per component (e.g., `todo-header`, `todo-item`, `todo-footer`).
-- **Element:** A part of a block that has no meaning on its own (e.g., `todo-header__title`, `todo-item__checkbox`).
+- **Block:** A standalone UI piece—typically one block per component (e.g., `to-do-header`, `todo-item`, `todo-footer`).
+- **Element:** A part of a block that has no meaning on its own (e.g., `to-do-header__title`, `todo-item__checkbox`).
 - **Modifier:** A variant or state of a block or element (e.g., `todo-item--completed`, `todo-footer__filter--active`).
 - **Component alignment:** Each component folder owns one BEM block. Elements and modifiers for that block live in the component’s SCSS and Handlebars template.
 - **Templates:** Handlebars outputs explicit BEM class names. Presentation layer only—controllers and services do not depend on CSS naming.
@@ -52,7 +52,7 @@ This project is a TodoMVC-style application designed to demonstrate advanced sof
     - Prefer `button` for in-page actions; use `a` only when navigation to a URL is intended.
     - Avoid `div`/`span` soup when a semantic element already expresses the structure.
 - **Component alignment:** Each component template should output markup that a reader (or screen reader) can understand without relying on class names alone.
-- **BEM + semantics:** BEM classes handle styling hooks; semantic tags handle document structure. Use both together—e.g., `<header class="todo-header">`, `<ul class="todo-list">`.
+- **BEM + semantics:** BEM classes handle styling hooks; semantic tags handle document structure. Use both together—e.g., `<header class="to-do-header">`, `<ul class="todo-list">`.
 
 ### Layered & Clean Architecture
 
@@ -78,6 +78,7 @@ This project is a TodoMVC-style application designed to demonstrate advanced sof
 ## Software Principles
 
 - **SOLID Principles**: Applied throughout the codebase.
+- **Design by Contract**: Components interact through explicit agreements—preconditions (what must be true before an operation), postconditions (what callers can rely on afterward), and invariants (properties that must hold over time). Shared types, function signatures, and layer boundaries express those contracts; TypeScript enforces them at compile time where possible. See [Strong Typing as a Programming Principle](./docs/strong-typing-principle.md) for related guidance on explicit contracts and strict typing.
 - **Functional Programming**: Immutability, pure functions, and declarative patterns.
 - **Reactive Programming**: Streams for state and events.
 - **Object-Oriented Programming**: Used where factories or encapsulation are appropriate.

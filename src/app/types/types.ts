@@ -1,4 +1,4 @@
-type toDoAnchorHeader = {
+type ToDoAnchorHeader = {
     type: 'to-do-anchor-header';
     title: string;
     href: string;
@@ -9,7 +9,7 @@ type ToDoForm = {
     placeholder: string;
 };
 
-type ToDoAnchorfilters = {
+type ToDoAnchorFilters = {
     type: 'to-do-anchor-filter';
     text: string;
     href: string;
@@ -27,14 +27,14 @@ type ToDoStatus = {
 
 type ToDoBar = {
     type: 'to-do-bar';
-    toDoAnchorfilters: ToDoAnchorfilters[];
+    toDoAnchorFlters: ToDoAnchorFilters[];
     toDoClearCompletedButton: ToDoClearCompletedButton;
     toDoStatus: ToDoStatus;
 };
 
 export type ToDo = {
     type: 'to-do';
-    toDoAnchorHeader: toDoAnchorHeader;
+    toDoAnchorHeader: ToDoAnchorHeader;
     toDoForm: ToDoForm;
     toDoBar: ToDoBar;
 };
