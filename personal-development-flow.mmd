@@ -1,0 +1,125 @@
+flowchart LR
+  subgraph techStack["Tech Stack"]
+    conceptsLanguage["Concepts<br/>and Language"]
+  end
+
+  subgraph localDevelopment["Local Development<br/>Configuration"]
+    localSetup["Repeatable Local<br/>Development Setup"]
+  end
+
+  subgraph applicationStructure["Application Structure"]
+    folderOrganization["Folder Organization<br/>According to the App's Architecture"]
+  end
+
+  subgraph stateManagement["State Management"]
+    direction LR
+
+    subgraph frontEndGroup[" "]
+      direction TB
+      frontEnd["App Renders What the Object Represents<br/>Contract Validation"]
+      frontEndLabel@{ shape: text, label: "Server. Front-End App" }
+      frontEnd ~~~ frontEndLabel
+    end
+
+    subgraph backEndGroup[" "]
+      direction TB
+      backEnd["App Abstraction Through an Object<br/>Designed by Contract Principle"]
+      backEndLabel@{ shape: text, label: "Server. Back-End App" }
+      backEnd ~~~ backEndLabel
+    end
+
+    frontEnd ~~~ backEnd
+    frontEnd -->|HTTP Request| backEnd
+    backEnd -->|Returns The App Model| frontEnd
+  end
+
+  subgraph codingDiscipline["Coding Discipline and Quality"]
+    direction LR
+
+    subgraph codingFrontEnd["Server. Front-End App"]
+      subgraph httpLayer["HTTP Layer"]
+        appModelRequest["Layer Requesting the App Model<br/>Keep in Mind: Timeout Error"]
+      end
+    end
+
+    subgraph codingBackEnd["Server. Back-End App"]
+      codingAbstraction["App Abstraction Through an Object<br/>Designed by Contract Principle"]
+    end
+
+    successful{"Successful?"}
+
+    subgraph successStateLayer["State Management Layer"]
+      setAppModel["Set The Object Model Of The App"]
+    end
+
+    subgraph failureStateLayer["State Management Layer"]
+      setFailureReason["Set The Object Modeling the Failure Reason"]
+    end
+
+    smoothFailureExperience["For Smooth User Experience, Shows a Spinner Until the State Management Layer Notifies if the Object Failure Is Ready"]
+
+    subgraph httpFailureComponents["Components Creation for HTTP Failures<br/>Apply Component Based Pattern"]
+      layoutShell["Build Layout Shell for Most of the Common HTTP Failure.<br/>For Unknown Ones Show a Generic Layout"]
+    end
+
+    browserTest["Test Each Layout for the HTTP Failures in the Browser"]
+
+    smoothAppExperience["For Smooth User Experience, Shows a Spinner Until the State Management Layer Notifies if the Object Modeling the App Is Ready"]
+
+    subgraph appComponents["Components Creation Representing the Entire App<br/>Apply Component Based Pattern"]
+      appLayoutShell["Build Layout Shell of Each Component Which Composed Together Represents the App"]
+    end
+
+    renderDefaultBehavior["Render the Default Behavior of the App in the Browser"]
+    attachGuestEvents["Attach to Each Component the Guest Events According to the App Behavior"]
+    registerGuestEvents["For Components With Guest Events, Register in Their Representation Object the Event.<br/>Each of Those Is Handled by State Management System"]
+    continueDevelopment["Keep Developing the App Through Services, Components Behavior, State Management Handling, Utils, Domain Layer/s, etc."]
+    tddTesting["While Development, Keep Testing the Code.<br/>Apply TDD as Much as Possible"]
+    accessibilityTesting["Walk Through Each Component and Test the Complete App Behavior to Make Sure It Achieves the Minimal Accessibility Requirements for Guests With Disabilities"]
+    performanceTesting["Make Sure the App Passes the Most Common Browser Performance Measures: LCP, CLS, INP.<br/>Speed, Responsiveness, and Stability"]
+
+    codingFrontEnd ~~~ codingBackEnd
+    codingAbstraction -->|Returns The App Model| appModelRequest
+    appModelRequest -->|HTTP Request| codingAbstraction
+    appModelRequest --> successful
+    successful -->|Yes: Object Model For The App| setAppModel
+    successful -->|No: Failure Reason Object| setFailureReason
+
+    setFailureReason -->|Is Data Ready ?| smoothFailureExperience
+    smoothFailureExperience -->|Once Notification Finishes| layoutShell
+    layoutShell -->|Layout Shell Building Finished ?| browserTest
+
+    setAppModel -->|Is Data Ready ?| smoothAppExperience
+    smoothAppExperience -->|Once Notification Finishes| appLayoutShell
+    appLayoutShell -->|Layout Shell Building Finished ?| renderDefaultBehavior
+    renderDefaultBehavior --> attachGuestEvents
+    attachGuestEvents --> registerGuestEvents
+    registerGuestEvents --> continueDevelopment
+    continueDevelopment --> tddTesting
+    tddTesting --> accessibilityTesting
+    accessibilityTesting --> performanceTesting
+  end
+
+  subgraph endResult["End Result"]
+    highestStandards["App with the Highest Software Standards.<br/>An Application: Extendable, Maintainable, Readable, Performant, Scalable, Resilient, Secured."]
+  end
+
+  techStack --> localDevelopment --> applicationStructure --> stateManagement --> codingDiscipline --> endResult
+
+  classDef foundation fill:#eef2ff,stroke:#818cf8,stroke-width:2px,color:#1e1b4b;
+  classDef frontend fill:#f0fdfa,stroke:#2dd4bf,stroke-width:2px,color:#042f2e;
+  classDef backend fill:#f5f3ff,stroke:#a78bfa,stroke-width:2px,color:#2e1065;
+  classDef decision fill:#fff7ed,stroke:#fb923c,stroke-width:2px,color:#431407;
+  classDef success fill:#f0fdf4,stroke:#4ade80,stroke-width:2px,color:#052e16;
+  classDef failure fill:#fef2f2,stroke:#f87171,stroke-width:2px,color:#450a0a;
+  classDef quality fill:#ecfeff,stroke:#22d3ee,stroke-width:2px,color:#083344;
+  classDef outcome fill:#f7fee7,stroke:#a3e635,stroke-width:3px,color:#1a2e05;
+
+  class conceptsLanguage,localSetup,folderOrganization foundation;
+  class frontEnd,appModelRequest frontend;
+  class backEnd,codingAbstraction backend;
+  class successful decision;
+  class setAppModel,smoothAppExperience,appLayoutShell,renderDefaultBehavior,attachGuestEvents,registerGuestEvents success;
+  class setFailureReason,smoothFailureExperience,layoutShell,browserTest failure;
+  class continueDevelopment,tddTesting,accessibilityTesting,performanceTesting quality;
+  class highestStandards outcome;
