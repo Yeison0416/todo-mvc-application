@@ -16,7 +16,7 @@ Stand up a Docker Compose environment — nginx reverse-proxying a Fastify skele
 ## Task List
 
 ### Phase 1: Standalone services
-- [ ] Task 1: Fastify skeleton (`server/`)
+- [x] Task 1: Fastify skeleton (`server/`)
 - [ ] Task 2: Dockerize Fastify
 - [ ] Task 3: Dockerize webpack-dev-server
 
