@@ -8,12 +8,12 @@
 **Description:** Initialize a standalone Fastify + TypeScript project under `server/` with one `GET /health` route returning `{ status: 'ok' }`, plus `ts-node-dev` for hot reload during local (non-Docker) development.
 
 **Acceptance criteria:**
-- [ ] `server/package.json` declares `fastify`, `typescript`, `ts-node-dev`
-- [ ] `server/tsconfig.json` mirrors root's strict settings
-- [ ] `server/src/index.ts` boots Fastify on port 3000, host `0.0.0.0`, with `GET /health`
+- [x] `server/package.json` declares `fastify`, `typescript`, `ts-node-dev`
+- [x] `server/tsconfig.json` mirrors root's strict settings
+- [x] `server/src/index.ts` boots Fastify on port 3000, host `0.0.0.0`, with `GET /health`
 
 **Verification:**
-- [ ] Manual: `cd server && npm install && npm run dev`, then `curl http://localhost:3000/health` returns `{"status":"ok"}`
+- [x] Manual: `cd server && npm install && npm run dev`, then `curl http://localhost:3000/health` returns `{"status":"ok"}`
 
 **Dependencies:** None
 
