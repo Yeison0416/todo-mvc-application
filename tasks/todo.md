@@ -31,12 +31,12 @@
 **Description:** Write `docker/fastify/Dockerfile` using the pinned latest Node tag, installing `server/`'s deps and running the dev reloader inside the container.
 
 **Acceptance criteria:**
-- [ ] Dockerfile pins an explicit Node tag (not a floating alias), with a dated comment
-- [ ] `docker build` succeeds
-- [ ] Running the container standalone and curling its mapped port returns the `/health` response
+- [x] Dockerfile pins an explicit Node tag (not a floating alias), with a dated comment
+- [x] `docker build` succeeds
+- [x] Running the container standalone and curling its mapped port returns the `/health` response
 
 **Verification:**
-- [ ] Manual: `docker build -f docker/fastify/Dockerfile -t fastify-dev .` then `docker run --rm -p 3000:3000 fastify-dev` then `curl localhost:3000/health`
+- [x] Manual: `docker build -f docker/fastify/Dockerfile -t fastify-dev .` then `docker run --rm -p 3000:3000 fastify-dev` then `curl localhost:3000/health`
 
 **Dependencies:** Task 1
 
