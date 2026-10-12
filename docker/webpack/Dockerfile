@@ -20,4 +20,7 @@ EXPOSE 8080
 
 # Not `npm start`: it passes --open (no browser in a container) and cannot take a --host
 # argument. Binding to 0.0.0.0 is what makes the dev server reachable through a published port.
-CMD ["npx", "webpack", "serve", "--config", "webpack.dev.js", "--host", "0.0.0.0"]
+# --client-web-socket-url-port 0 makes the page's HMR client connect to the port shown in the
+# browser's address bar. Without it the client uses the container's internal port (8080), which
+# breaks as soon as the published port differs (e.g. -p 8081:8080) or a proxy sits in front.
+CMD ["npx", "webpack", "serve", "--config", "webpack.dev.js", "--host", "0.0.0.0", "--client-web-socket-url-port", "0"]
