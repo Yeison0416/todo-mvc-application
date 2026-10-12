@@ -28,13 +28,14 @@ Browser  →  http://localhost:8080
 
 ## What's included
 
-| Piece                                               | State                 |
-| --------------------------------------------------- | --------------------- |
-| Fastify API skeleton (`server/`)                    | Included and verified |
-| Fastify container image (`docker/fastify/`)         | Included and verified |
-| Frontend dev server container (webpack, Vite, ...)  | Not included yet      |
-| nginx reverse proxy                                 | Not included yet      |
-| Docker Compose file that starts everything together | Not included yet      |
+| Piece                                               | State                          |
+| --------------------------------------------------- | ------------------------------ |
+| Fastify API skeleton (`server/`)                    | Included and verified          |
+| Fastify container image (`docker/fastify/`)         | Included and verified          |
+| Frontend dev server container (webpack)             | Included, server side verified |
+| Frontend dev server container (Vite, ...)           | Not included yet               |
+| nginx reverse proxy                                 | Not included yet               |
+| Docker Compose file that starts everything together | Not included yet               |
 
 Today only the Fastify API exists. It runs either directly on your machine or inside a container, and both are verified. The proxy, the frontend container and Compose are not built yet, so `localhost:8080` does not work yet.
 
@@ -52,6 +53,7 @@ server/
   README.md           this document
 docker/
   fastify/Dockerfile  recipe for the Fastify container image
+  webpack/Dockerfile  recipe for the frontend dev server (webpack) container image
 .dockerignore         files Docker should not send when building
 ```
 
@@ -128,6 +130,22 @@ The build context is the repository root (the `.` at the end), because the Docke
 
 `-p 3000:3000` connects port 3000 on your machine to port 3000 inside the container.
 
+### Frontend dev server in a container
+
+The frontend's source folder is bind-mounted into the container (mapped from your machine), so edits on your machine reload the page. Only `src` is mounted, never `node_modules`: the image installs its own dependencies.
+
+```bash
+docker build -f docker/webpack/Dockerfile -t webpack-dev .
+docker run -d --rm --name webpack-dev-test -p 8081:8080 -v "$(pwd)/src:/app/src" webpack-dev
+# open http://localhost:8081
+docker logs -f webpack-dev-test      # shows each rebuild when you save a file
+docker stop webpack-dev-test
+```
+
+The container runs `webpack serve --host 0.0.0.0` directly instead of `npm start`: `npm start` opens a browser (there is none in a container) and cannot take a `--host` argument. `--host 0.0.0.0` is what makes the dev server reachable through the published port.
+
+`WATCHPACK_POLLING=true` is set in the image because file-change events from a bind-mounted host folder often never reach the container on macOS. Polling makes webpack check files on a timer, so a save is picked up within a few seconds.
+
 ## Useful commands
 
 ```bash
@@ -162,19 +180,18 @@ colima stop                        # stops the VM and every container in it
 
 ## Troubleshooting
 
-| Symptom                                                      | Likely cause and fix                                                                                                      |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `Cannot connect to the Docker daemon`                        | Colima isn't running. Run `colima start`.                                                                                 |
-| `port is already allocated` or `address already in use`      | Something is using port 3000. Run `docker ps` to find a container, or `lsof -i :3000` for a local process.                |
-| `npm ci` fails with `E401` during the build                  | The lockfile points at a private registry. Check it for private URLs and regenerate against the public registry.          |
-| `docker build` hangs at the start                            | The build context is too large. Check that the root `.dockerignore` exists and excludes `node_modules`.                   |
-| `Must use import to load ES Module`                          | `"type": "module"` was added to `server/package.json`. Remove it, because the reloader needs CommonJS.                    |
-| Changes on your machine don't show up in a running container | Expected: the container has its own copy of the code. A bind mount (mapping a host folder into the container) fixes this. |
+| Symptom                                                      | Likely cause and fix                                                                                                                                                                                          |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Cannot connect to the Docker daemon`                        | Colima isn't running. Run `colima start`.                                                                                                                                                                     |
+| `port is already allocated` or `address already in use`      | Something is using port 3000. Run `docker ps` to find a container, or `lsof -i :3000` for a local process.                                                                                                    |
+| `npm ci` fails with `E401` during the build                  | The lockfile points at a private registry. Check it for private URLs and regenerate against the public registry.                                                                                              |
+| `docker build` hangs at the start                            | The build context is too large. Check that the root `.dockerignore` exists and excludes `node_modules`.                                                                                                       |
+| `Must use import to load ES Module`                          | `"type": "module"` was added to `server/package.json`. Remove it, because the reloader needs CommonJS.                                                                                                        |
+| Changes on your machine don't show up in a running container | The container has its own copy of the code unless the folder is bind-mounted (`-v`). If it is mounted but nothing rebuilds, file events aren't reaching the container: check `WATCHPACK_POLLING=true` is set. |
 
 ## What's planned
 
-1. A container for the frontend dev server, with the source bind-mounted so edits reload in the browser.
-2. An nginx config that sends `/` to the frontend and `/api` to Fastify, including the headers the hot-reload websocket needs.
-3. A `docker-compose.yml` that starts all three with `docker compose up --build` and publishes only the proxy's port.
+1. An nginx config that sends `/` to the frontend and `/api` to Fastify, including the headers the hot-reload websocket needs.
+2. A `docker-compose.yml` that starts all three with `docker compose up --build` and publishes only the proxy's port.
 
 After that, the API can grow (for example, endpoints that simulate failures) without changing the proxy or Compose setup.
