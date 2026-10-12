@@ -52,10 +52,10 @@
 **Description:** Write `docker/webpack/Dockerfile` that installs root deps and runs the existing `npm start` (webpack serve) inside a container, with source bind-mounted from the host.
 
 **Acceptance criteria:**
-- [ ] Dockerfile builds on a Node image
+- [x] Dockerfile builds on a Node image
 - [ ] Running standalone and visiting the mapped port in a browser serves the TodoMVC app
 - [ ] Editing a source file on the host triggers HMR in the browser
-- [ ] `node_modules` is not bind-mounted from host (anonymous volume or container-only install)
+- [x] `node_modules` is not bind-mounted from host (anonymous volume or container-only install)
 
 **Verification:**
 - [ ] Manual: `docker build -f docker/webpack/Dockerfile -t webpack-dev .` then `docker run --rm -p 8081:8080 -v $(pwd)/src:/app/src webpack-dev`; edit a file; confirm HMR in browser
