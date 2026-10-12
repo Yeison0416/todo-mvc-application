@@ -1,6 +1,7 @@
-# Pinned 2026-10-09: latest stable Node release (26.11.1) on Alpine 3.24.
+# Pinned 2026-10-12: Node 24 LTS (24.21.0) on Alpine 3.24. LTS because it is supported
+# until 2028-04 and matches the local Node and @types/node used by the project.
 # Explicit tag on purpose: no floating aliases (see SPEC-dev-infra.md, Boundaries).
-FROM node:26.11.1-alpine3.24
+FROM node:24.21.0-alpine3.24
 
 WORKDIR /app
 
