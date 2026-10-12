@@ -1,0 +1,17 @@
+# Pinned 2026-10-12: Node 24 LTS (24.21.0) on Alpine 3.24. LTS because it is supported
+# until 2028-04 and matches the local Node and @types/node used by the project.
+# Explicit tag on purpose: no floating aliases (see SPEC-dev-infra.md, Boundaries).
+FROM node:24.21.0-alpine3.24
+
+WORKDIR /app
+
+# Dependencies first, so this layer is cached until the manifests change.
+COPY server/package.json server/package-lock.json ./
+RUN npm ci
+
+COPY server/tsconfig.json ./
+COPY server/src ./src
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
