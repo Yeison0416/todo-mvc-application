@@ -28,7 +28,7 @@ Stand up a Docker Compose environment — nginx and a Fastify skeleton in contai
 - [x] Reviewed with human (PRs #4 and #5)
 
 ### Phase 2: Reverse proxy and composition
-- [ ] Task 3: nginx reverse proxy config
+- [x] Task 3: nginx reverse proxy config
 - [ ] Task 4: `docker-compose.yml` wiring + end-to-end verification
 
 ### Checkpoint: Complete
@@ -53,10 +53,15 @@ Stand up a Docker Compose environment — nginx and a Fastify skeleton in contai
 
 ## Open Questions
 
-1. **Host reachability from the nginx container.** Whether `host.docker.internal` reaches a dev server bound to the host's localhost on Colima is unverified. Resolve it as the first step of Task 3.
+None open.
+
+### Resolved
+
+1. **Host reachability from the nginx container** (resolved Oct 19, 2026, Task 3). On Colima, a container started with `--add-host host.docker.internal:host-gateway` reaches a host server on port 3001 whether it is bound to `127.0.0.1` or `0.0.0.0`, so the dev server does not need to listen on all interfaces. Compose still needs the `extra_hosts` entry (Task 4).
 
 ## Decisions
 
+- **nginx image: `nginx:1.31.7-alpine3.24`** (Oct 19, 2026), the explicit tag behind `nginx:alpine`. There is no nginx Dockerfile, so the pin goes in `docker-compose.yml` (Task 4) with a dated comment.
 - **Frontend dev server port: 3001** (developer, Oct 19, 2026). nginx keeps 8080. Applying it means touching the frontend's dev server config or start command, which the spec lists as "ask first"; it happens in Task 4, with review.
 
 ## Scope changes
