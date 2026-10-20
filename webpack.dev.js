@@ -10,6 +10,13 @@ module.exports = merge(commonConfig, {
     devServer: {
         watchFiles: './src/**/*.html',
         static: './dist',
+        // Served through the nginx proxy from `docker compose` (dev-infra): nginx owns 8080, the dev server listens on 3001.
+        port: 3001,
+        open: 'http://localhost:8080',
+        client: {
+            // Port 0 makes the HMR client use the page's own origin, so the websocket goes through nginx.
+            webSocketURL: { port: 0 },
+        },
     },
 
     module: {

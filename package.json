@@ -10,7 +10,7 @@
         "test:coverage:open": "jest --coverage && open ./coverage/lcov-report/index.html",
         "type-check": "tsc --noEmit",
         "type-check:watch": "tsc --noEmit --watch",
-        "start": "concurrently -k -n \"WEBPACK,TS\" -c \"cyan,magenta\" \"webpack serve --open --config webpack.dev.js\" \"npm run type-check:watch\"",
+        "start": "concurrently -k -n \"WEBPACK,TS\" -c \"cyan,magenta\" \"webpack serve --config webpack.dev.js\" \"npm run type-check:watch\"",
         "build": "npm run type-check && webpack --config webpack.prod.js",
         "build-dev": "npm run type-check && webpack --config webpack.dev.js",
         "format": "prettier --write .",
