@@ -1,6 +1,7 @@
 # Foundation Layer — Confirmed Intent
 
 > Captured from interview session, Oct 4 2026.
+> **Amended Oct 19, 2026 (developer's direction): hybrid setup** — the frontend dev server runs on the host; only nginx and Fastify run in containers. See the Infrastructure section.
 > Do not treat this as an implementation spec — the step-by-step plan comes later.
 > Precedes Phase 2 (spec-driven-development) of the main TodoMVC feature work — see [`todomvc.md`](./todomvc.md).
 
@@ -8,7 +9,7 @@
 
 ## Outcome
 
-Build a local, Dockerized foundation layer — **nginx** reverse-proxying a **Fastify** mock API and the **webpack dev server** under a single origin — that wires the TodoMVC frontend's HTTP layer to a real backend, with a unified RxJS state store and a defined failure taxonomy. The goal is to be able to deliberately trigger and visually verify every failure path (and the success path) before any TodoMVC feature work begins, so that subsequent feature work (components, services, utils) doesn't have to also solve HTTP, error-handling, and state-management concerns.
+Build a local foundation layer — **nginx** and a **Fastify** mock API running in Docker, with nginx reverse-proxying both the API and the **webpack dev server** (running on the host) under a single origin — that wires the TodoMVC frontend's HTTP layer to a real backend, with a unified RxJS state store and a defined failure taxonomy. The goal is to be able to deliberately trigger and visually verify every failure path (and the success path) before any TodoMVC feature work begins, so that subsequent feature work (components, services, utils) doesn't have to also solve HTTP, error-handling, and state-management concerns.
 
 ---
 
@@ -21,11 +22,14 @@ Build a local, Dockerized foundation layer — **nginx** reverse-proxying a **Fa
 
 ## Infrastructure
 
-- **Docker Compose** with three services:
+**Hybrid setup:** the backend infrastructure runs in containers; the frontend runs natively on the host.
+
+- **Docker Compose** with two services:
   - `nginx` — reverse proxy, single entry point
   - `fastify` — mock API server (app config endpoint + failure simulation)
-  - `webpack-dev-server` — frontend
-- `nginx` reverse-proxies **both** the Fastify API and the webpack dev server under **one origin** (avoids CORS; requires `Upgrade`/`Connection` headers proxied correctly for webpack's HMR websocket).
+- **`webpack-dev-server` runs on the host**, not in a container, started with the project's own dev command. Native file watching makes rebuilds and HMR fast, which a bind-mounted container could not match on macOS.
+- `nginx` reverse-proxies **both** the Fastify API (container) and the frontend dev server (host, via `host.docker.internal`) under **one origin** (avoids CORS; requires `Upgrade`/`Connection` headers proxied correctly for the HMR websocket, and the HMR client connecting to the page's origin).
+- The layer states a small **frontend contract** (see `SPEC-dev-infra.md`) instead of owning the frontend's configuration, so it works with any bundler's dev server.
 
 ## Failure Model
 
@@ -104,3 +108,5 @@ Both of the following must hold:
 ## Confirmation
 
 Explicit **yes** from developer on Oct 4, 2026.
+
+Amended on Oct 19, 2026 at the developer's direction: hybrid setup (frontend dev server on the host, nginx and Fastify in containers). The webpack container is out of scope.
