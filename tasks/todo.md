@@ -57,7 +57,7 @@
 
 ## Task 3: nginx reverse proxy config
 
-**Description:** Write `docker/nginx/default.conf` routing `/api/` to the Fastify service (by compose service name, not `localhost`, with the `/api` prefix stripped so `/api/health` reaches Fastify's `/health`) and `/` to the frontend dev server running on the host (`host.docker.internal`, on the frontend port from the spec's Open Questions), including `Upgrade`/`Connection` headers for the HMR websocket. First step: confirm the nginx container can actually reach a dev server running on the host (see Open Question 2 in the plan).
+**Description:** Write `docker/nginx/default.conf` routing `/api/` to the Fastify service (by compose service name, not `localhost`, with the `/api` prefix stripped so `/api/health` reaches Fastify's `/health`) and `/` to the frontend dev server running on the host (`host.docker.internal:3001`), including `Upgrade`/`Connection` headers for the HMR websocket. First step: confirm the nginx container can actually reach a dev server running on the host (see Open Question 2 in the plan).
 
 **Acceptance criteria:**
 - [ ] `default.conf` has two `location` blocks: `/` and `/api/`
@@ -96,7 +96,7 @@
 
 **Files likely touched:**
 - `docker-compose.yml`
-- the frontend's dev server config or start command, only if the port or HMR settings must change (ask first, per the spec)
+- the frontend's dev server config or start command, to move it to port 3001 and point its HMR client at the page's origin (ask first, per the spec)
 
 **Estimated scope:** S (1–2 files)
 

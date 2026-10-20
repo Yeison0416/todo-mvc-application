@@ -20,7 +20,7 @@ Start the infrastructure:    docker compose up --build
 Stop the infrastructure:     docker compose down
 Rebuild one service:         docker compose up --build fastify
 Fastify logs:                docker compose logs -f fastify
-Start the frontend (host):   the project's own dev command, on the frontend port (see Open Questions)
+Start the frontend (host):   the project's own dev command, on port 3001
 Open the app:                http://localhost:8080  (through nginx — not the dev server's own port)
 Fastify local install:       cd server && npm install
 Fastify dev (outside compose, fast iteration): cd server && npm run dev
@@ -36,7 +36,7 @@ Browser  →  http://localhost:8080
    "/" (frontend)            "/api/" (backend)
         │                         │
  host.docker.internal:      fastify:3000
- <frontend port>            (container, internal network only)
+ 3001                       (container, internal network only)
  [ dev server on the host ]
 ```
 
@@ -55,7 +55,7 @@ server/
 ## Frontend contract
 What the frontend dev server must satisfy for this layer to work. The layer states these requirements; it does not own the frontend's configuration.
 
-1. **Runs on the host**, started by the project's own dev command, listening on a port other than 8080 (nginx owns 8080).
+1. **Runs on the host**, started by the project's own dev command, listening on port **3001** (nginx owns 8080, so webpack's default of 8080 must be moved).
 2. **Reachable from the nginx container** through `host.docker.internal` (this may require the dev server to listen on all interfaces and not only `localhost` — see Open Questions).
 3. **Accepts the proxied `Host` header** (`localhost:8080`); nginx forwards the original host.
 4. **HMR client connects to the page's origin**, so the websocket goes through nginx. webpack-dev-server injects its own listening port into the client by default, which breaks behind a proxy (webpack: `--client-web-socket-url-port 0`; Vite: `server.hmr.clientPort`).
@@ -98,8 +98,8 @@ Infra wiring, not business logic — no Jest unit tests here. Verification is ma
 - `failure-simulation-api` can be built directly on this skeleton without touching nginx/compose config.
 
 ## Open Questions
-- **Frontend dev server port (open).** nginx keeps 8080, so the host dev server must move off webpack's default of 8080. Proposed: 3001. Applying it touches the frontend's dev server config or start command ("ask first" above). Confirm before Task 3/4 edits it.
 - **Host reachability (open).** Whether the nginx container can reach a dev server bound to the host's localhost through `host.docker.internal` on Colima is unverified; the dev server may need to listen on all interfaces. Resolve it as the first step of Task 3. Compose adds `extra_hosts: host.docker.internal:host-gateway` so the name also resolves on Linux.
 
 ## Open Questions — resolved
+- **Frontend dev server port:** 3001 (decided by the developer, Oct 19, 2026). nginx keeps 8080, so the host dev server moves off webpack's default of 8080. Applying it touches the frontend's dev server config or start command, which stays an "ask first" change: it happens in Task 4, with review.
 - **Node tag for the Fastify container:** pinned to Node 24 LTS (`node:24.21.0-alpine3.24`, dated in the Dockerfile comment), not the floating `node:current-alpine` alias, per the "Always pin image tags" boundary above. The original wording said "latest stable release", but Node 26 is not LTS until Oct 28, 2026; Node 24 is LTS and matches the project's dependencies and local Node.

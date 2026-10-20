@@ -45,7 +45,7 @@ Stand up a Docker Compose environment — nginx and a Fastify skeleton in contai
 |---|---|---|
 | nginx container can't reach a service on the host (`host.docker.internal` on Colima; dev server listening on localhost only) | High — `/` returns 502 | Verify reachability first in Task 3/4 before building anything on it; if needed, have the dev server listen on all interfaces; add `extra_hosts: host.docker.internal:host-gateway` in compose for portability |
 | HMR websocket doesn't survive the nginx proxy, or the HMR client dials the dev server's own port instead of the page's origin | Medium — dev experience degrades to manual refresh, console shows failed `ws://localhost:<port>/ws` | Treat HMR as an explicit acceptance criterion in Task 4; `Upgrade`/`Connection` headers built into Task 3 from the start; the frontend contract requires the HMR client to use the page's origin (webpack `--client-web-socket-url-port 0`, Vite `server.hmr.clientPort`) |
-| Port clash: the host dev server defaults to 8080, the same port nginx publishes | Medium — one of them fails to start | Frontend dev server moves to another port (see Open Questions); nginx keeps 8080 per the spec |
+| Port clash: the host dev server defaults to 8080, the same port nginx publishes | Medium — one of them fails to start | Frontend dev server moves to port 3001 (decided Oct 19, 2026); nginx keeps 8080 per the spec |
 | nginx config check fails standalone because the upstream hostnames (`fastify`, `host.docker.internal`) don't resolve outside compose | Low | Run the Task 3 check with `--add-host` entries for both names, or inside the compose network |
 | Frontend toolchain is no longer containerized, so it depends on the host's Node version (`.nvmrc` says v21.6.1, which Jest 30 does not support) | Low–Medium — works on one machine, breaks on another | Out of scope for this module; fix `.nvmrc` to the supported Node version separately |
 | Pinned "latest Node" tag goes stale | Low | Tag is explicit and dated in the Dockerfile comment; revisited if a future module needs a newer feature |
@@ -53,8 +53,11 @@ Stand up a Docker Compose environment — nginx and a Fastify skeleton in contai
 
 ## Open Questions
 
-1. **Frontend dev server port.** nginx keeps 8080, so the host dev server must move off webpack's default of 8080. Proposed: 3001. Changing it means touching the frontend's dev server config (or its start command), which the spec lists as "ask first". Confirm before Task 3/4 edits it.
-2. **Host reachability from the nginx container.** Whether `host.docker.internal` reaches a dev server bound to the host's localhost on Colima is unverified. Resolve it as the first step of Task 3.
+1. **Host reachability from the nginx container.** Whether `host.docker.internal` reaches a dev server bound to the host's localhost on Colima is unverified. Resolve it as the first step of Task 3.
+
+## Decisions
+
+- **Frontend dev server port: 3001** (developer, Oct 19, 2026). nginx keeps 8080. Applying it means touching the frontend's dev server config or start command, which the spec lists as "ask first"; it happens in Task 4, with review.
 
 ## Scope changes
 
