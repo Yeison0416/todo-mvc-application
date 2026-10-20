@@ -48,7 +48,7 @@ The frontend dev server is not part of the layer. It runs on your machine and is
 
 For the layer to work, the frontend dev server must:
 
-1. **Run on the host** on a port other than 8080, because nginx owns 8080.
+1. **Run on the host** on a port other than 8080, because nginx owns 8080 (this repo uses 3001).
 2. **Be reachable from the nginx container** through `host.docker.internal`. This may require the dev server to listen on all interfaces and not only `localhost`. This is not verified yet.
 3. **Accept the proxied `Host` header** (`localhost:8080`). nginx forwards the original host.
 4. **Make its hot-reload client connect to the page's origin,** so the websocket goes through nginx. Dev servers inject their own listening port into the client by default, which breaks behind a proxy (webpack: `--client-web-socket-url-port 0`, Vite: `server.hmr.clientPort`).
