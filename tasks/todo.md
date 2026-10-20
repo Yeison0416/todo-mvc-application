@@ -1,7 +1,8 @@
 # Tasks: dev-infra (Foundation Layer)
 
-> See [`tasks/plan.md`](./plan.md) for architecture decisions, risks, and checkpoints.
+> See [`tasks/plan.md`](./plan.md) for architecture decisions, risks, open questions and the scope-change log.
 > Spec: [`docs/specs/SPEC-dev-infra.md`](../docs/specs/SPEC-dev-infra.md).
+> Hybrid setup (amended Oct 19, 2026): nginx and Fastify run in containers; the frontend dev server runs on the host.
 
 ## Task 1: Fastify skeleton (`server/`)
 
@@ -47,49 +48,28 @@
 
 ---
 
-## Task 3: Dockerize webpack-dev-server
-
-**Description:** Write `docker/webpack/Dockerfile` that installs root deps and runs the existing `npm start` (webpack serve) inside a container, with source bind-mounted from the host.
-
-**Acceptance criteria:**
-- [ ] Dockerfile builds on a Node image
-- [ ] Running standalone and visiting the mapped port in a browser serves the TodoMVC app
-- [ ] Editing a source file on the host triggers HMR in the browser
-- [ ] `node_modules` is not bind-mounted from host (anonymous volume or container-only install)
-
-**Verification:**
-- [ ] Manual: `docker build -f docker/webpack/Dockerfile -t webpack-dev .` then `docker run --rm -p 8081:8080 -v $(pwd)/src:/app/src webpack-dev`; edit a file; confirm HMR in browser
-
-**Dependencies:** None (parallel with Tasks 1–2)
-
-**Files likely touched:**
-- `docker/webpack/Dockerfile`
-
-**Estimated scope:** S (1 file)
+## Checkpoint: Phase 1 (Tasks 1–2)
+- [x] Fastify container builds and runs standalone
+- [x] Fastify container responds to `/health` on its own mapped port
+- [x] Reviewed with human (PRs #4 and #5)
 
 ---
 
-## Checkpoint: Phase 1 (Tasks 1–3)
-- [ ] Each container builds and runs standalone
-- [ ] Fastify container responds to `/health` on its own mapped port
-- [ ] Webpack container serves the app with working HMR on its own mapped port
-- [ ] Review with human before proceeding to Phase 2
+## Task 3: nginx reverse proxy config
 
----
-
-## Task 4: nginx reverse proxy config
-
-**Description:** Write `docker/nginx/default.conf` routing `/` to the webpack-dev-server service and `/api` to the Fastify service (by compose service name, not `localhost`), including `Upgrade`/`Connection` headers for the webpack HMR websocket.
+**Description:** Write `docker/nginx/default.conf` routing `/api/` to the Fastify service (by compose service name, not `localhost`, with the `/api` prefix stripped so `/api/health` reaches Fastify's `/health`) and `/` to the frontend dev server running on the host (`host.docker.internal`, on the frontend port from the spec's Open Questions), including `Upgrade`/`Connection` headers for the HMR websocket. First step: confirm the nginx container can actually reach a dev server running on the host (see Open Question 2 in the plan).
 
 **Acceptance criteria:**
 - [ ] `default.conf` has two `location` blocks: `/` and `/api/`
 - [ ] Websocket upgrade headers present on the `/` location
-- [ ] `proxy_pass` targets reference compose service names, anticipating compose networking (not yet verifiable standalone)
+- [ ] `/api/` `proxy_pass` targets the Fastify compose service name and strips the `/api` prefix
+- [ ] `/` `proxy_pass` targets `host.docker.internal` (the host's dev server), not a compose service
+- [ ] Reachability of a host service from a throwaway nginx container is confirmed (or the fallback noted in the plan is applied)
 
 **Verification:**
-- [ ] Manual: `nginx -t` syntax check via a throwaway `nginx:alpine` container mounting the config (full behavioral verification happens in Task 5)
+- [ ] Manual: `nginx -t` syntax check via a throwaway `nginx:alpine` container mounting the config, with `--add-host` entries so the upstream names resolve (full behavioral verification happens in Task 4)
 
-**Dependencies:** Tasks 2, 3
+**Dependencies:** Task 2
 
 **Files likely touched:**
 - `docker/nginx/default.conf`
@@ -98,26 +78,27 @@
 
 ---
 
-## Task 5: `docker-compose.yml` wiring + end-to-end verification
+## Task 4: `docker-compose.yml` wiring + end-to-end verification
 
-**Description:** Create `docker-compose.yml` defining the three services (nginx, fastify, webpack), publishing only nginx's port (8080) to the host; fastify and webpack are reachable only on the internal compose network.
+**Description:** Create `docker-compose.yml` defining the two services (nginx, fastify), publishing only nginx's port (8080) to the host; fastify is reachable only on the internal compose network. nginx gets `extra_hosts: host.docker.internal:host-gateway` so it can reach the frontend dev server on the host on any platform. The frontend dev server is started separately on the host.
 
 **Acceptance criteria:**
-- [ ] `docker compose up --build` starts all three containers successfully
-- [ ] `http://localhost:8080/` serves the frontend app
-- [ ] Editing a frontend source file triggers HMR through the proxy
+- [ ] `docker compose up --build` starts both containers successfully
+- [ ] With the frontend dev server running on the host, `http://localhost:8080/` serves the frontend app
+- [ ] Editing a frontend source file triggers HMR through the proxy, with no failed `ws://` connections in the browser console
 - [ ] `http://localhost:8080/api/health` returns `{"status":"ok"}`
 - [ ] `docker compose ps` shows only nginx's port published
 
 **Verification:**
-- [ ] Manual: `docker compose up --build`; browser checks above; `docker compose ps`
+- [ ] Manual: `docker compose up --build`; start the frontend on the host; browser checks above; `docker compose ps`
 
-**Dependencies:** Tasks 1–4
+**Dependencies:** Tasks 1–3
 
 **Files likely touched:**
 - `docker-compose.yml`
+- the frontend's dev server config or start command, only if the port or HMR settings must change (ask first, per the spec)
 
-**Estimated scope:** S (1 file)
+**Estimated scope:** S (1–2 files)
 
 ---
 

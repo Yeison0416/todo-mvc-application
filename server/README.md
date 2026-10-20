@@ -8,37 +8,52 @@ This document explains what the layer contains, what each tool does, and how to 
 
 ## Goals
 
-- **One command to start everything** (the target, once all pieces below are in place).
+- **One command to start the infrastructure** (`docker compose up`, the target once all pieces below are in place), plus the frontend's own dev command.
 - **One origin.** The browser talks to a single address for both the frontend and the API, so there are no cross-origin (CORS) problems in development.
-- **Reproducible.** Everything runs in containers with pinned versions, so it behaves the same on every machine.
-- **Independent of the app.** The layer knows nothing about the frontend's features. It only needs the frontend's dev server to listen on a port.
+- **Reproducible backend.** The API and the proxy run in containers with pinned versions, so they behave the same on every machine.
+- **Fast frontend feedback.** The frontend dev server runs directly on your machine, not in a container, so it uses native file watching and rebuilds and hot reloads quickly.
+- **Independent of the app.** The layer knows nothing about the frontend's features. It only needs the frontend's dev server to meet a small contract (see below).
 
 ## Target architecture
 
 ```
 Browser  →  http://localhost:8080
                   │
-               [ nginx ]              the only port published to your machine
+               [ nginx ]                   container, the only port published to your machine
                   │
-        ┌─────────┴──────────┐
-   "/" (frontend)       "/api" (backend)
-        │                    │
- [ frontend dev server ]  [ Fastify ]
+        ┌─────────┴────────────┐
+   "/" (frontend)         "/api/" (backend)
+        │                      │
+ host.docker.internal     [ Fastify ]      container, internal network only
+        │
+ [ frontend dev server ]                   runs on your machine, outside Docker
 ```
+
+This is a hybrid setup: the backend infrastructure is containerized, and the frontend runs natively. nginx stays the single entry point, so you always open `http://localhost:8080`, never the dev server's own port.
 
 ## What's included
 
-| Piece                                               | State                 |
-| --------------------------------------------------- | --------------------- |
-| Fastify API skeleton (`server/`)                    | Included and verified |
-| Fastify container image (`docker/fastify/`)         | Included and verified |
-| Frontend dev server container (webpack, Vite, ...)  | Not included yet      |
-| nginx reverse proxy                                 | Not included yet      |
-| Docker Compose file that starts everything together | Not included yet      |
+| Piece                                       | State                 |
+| ------------------------------------------- | --------------------- |
+| Fastify API skeleton (`server/`)            | Included and verified |
+| Fastify container image (`docker/fastify/`) | Included and verified |
+| nginx reverse proxy                         | Not included yet      |
+| Docker Compose file (nginx + Fastify)       | Not included yet      |
 
-Today only the Fastify API exists. It runs either directly on your machine or inside a container, and both are verified. The proxy, the frontend container and Compose are not built yet, so `localhost:8080` does not work yet.
+Today only the Fastify API exists. It runs either directly on your machine or inside a container, and both are verified. The proxy and Compose are not built yet, so `localhost:8080` does not work yet.
 
-The frontend container is designed to be bundler-agnostic: any dev server that listens on a port and supports a hot-reload websocket should fit. Webpack is the first one planned, so do not assume Vite works until it has been verified.
+The frontend dev server is not part of the layer. It runs on your machine and is started with the frontend's own dev command.
+
+### Frontend contract
+
+For the layer to work, the frontend dev server must:
+
+1. **Run on the host** on a port other than 8080, because nginx owns 8080.
+2. **Be reachable from the nginx container** through `host.docker.internal`. This may require the dev server to listen on all interfaces and not only `localhost`. This is not verified yet.
+3. **Accept the proxied `Host` header** (`localhost:8080`). nginx forwards the original host.
+4. **Make its hot-reload client connect to the page's origin,** so the websocket goes through nginx. Dev servers inject their own listening port into the client by default, which breaks behind a proxy (webpack: `--client-web-socket-url-port 0`, Vite: `server.hmr.clientPort`).
+
+Any dev server that meets these four points fits, whichever bundler it is. Neither webpack nor Vite has been verified against the finished layer yet.
 
 ## What's in the layer
 
@@ -156,7 +171,7 @@ colima stop                        # stops the VM and every container in it
 
 - **Pinned image tags.** Every Dockerfile uses an explicit version tag with a dated comment, never `latest` or a floating alias.
 - **Public npm registry only.** `server/.npmrc` sets `registry=https://registry.npmjs.org/`. A lockfile that records URLs of a private registry fails in any container or machine without credentials. Before committing a lockfile, check it contains no private-registry URLs.
-- **Only the proxy's port is published** to the host once Compose exists. The API and the frontend dev server are reachable only inside the Compose network.
+- **Only the proxy's port is published** to the host once Compose exists. The API is reachable only inside the Compose network. The frontend dev server is a host process on its own port, reached through nginx.
 - **CommonJS.** `server/package.json` has no `"type": "module"`, and `tsconfig.json` uses `Node16` resolution. `ts-node-dev` does not support ES modules, so switching to ESM also means replacing the dev reloader.
 - **The layer stays app-agnostic.** Nothing here should import from or depend on the frontend's code.
 
@@ -173,8 +188,7 @@ colima stop                        # stops the VM and every container in it
 
 ## What's planned
 
-1. A container for the frontend dev server, with the source bind-mounted so edits reload in the browser.
-2. An nginx config that sends `/` to the frontend and `/api` to Fastify, including the headers the hot-reload websocket needs.
-3. A `docker-compose.yml` that starts all three with `docker compose up --build` and publishes only the proxy's port.
+1. An nginx config that sends `/` to the frontend dev server on the host and `/api/` to Fastify, including the headers the hot-reload websocket needs.
+2. A `docker-compose.yml` that starts nginx and Fastify with `docker compose up --build` and publishes only the proxy's port.
 
 After that, the API can grow (for example, endpoints that simulate failures) without changing the proxy or Compose setup.
