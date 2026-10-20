@@ -98,8 +98,9 @@ Infra wiring, not business logic — no Jest unit tests here. Verification is ma
 - `failure-simulation-api` can be built directly on this skeleton without touching nginx/compose config.
 
 ## Open Questions
-- **Host reachability (open).** Whether the nginx container can reach a dev server bound to the host's localhost through `host.docker.internal` on Colima is unverified; the dev server may need to listen on all interfaces. Resolve it as the first step of Task 3. Compose adds `extra_hosts: host.docker.internal:host-gateway` so the name also resolves on Linux.
+None open.
 
 ## Open Questions — resolved
 - **Frontend dev server port:** 3001 (decided by the developer, Oct 19, 2026). nginx keeps 8080, so the host dev server moves off webpack's default of 8080. Applying it touches the frontend's dev server config or start command, which stays an "ask first" change: it happens in Task 4, with review.
 - **Node tag for the Fastify container:** pinned to Node 24 LTS (`node:24.21.0-alpine3.24`, dated in the Dockerfile comment), not the floating `node:current-alpine` alias, per the "Always pin image tags" boundary above. The original wording said "latest stable release", but Node 26 is not LTS until Oct 28, 2026; Node 24 is LTS and matches the project's dependencies and local Node.
+- **Host reachability (resolved Oct 19, 2026, Task 3):** on Colima the nginx container reaches a host dev server through `host.docker.internal` (with `--add-host host.docker.internal:host-gateway`, which compose provides as `extra_hosts`), even when the dev server is bound to `127.0.0.1` only. No bind-address change is needed on the frontend. The nginx image is pinned to `nginx:1.31.7-alpine3.24`.

@@ -60,16 +60,18 @@
 **Description:** Write `docker/nginx/default.conf` routing `/api/` to the Fastify service (by compose service name, not `localhost`, with the `/api` prefix stripped so `/api/health` reaches Fastify's `/health`) and `/` to the frontend dev server running on the host (`host.docker.internal:3001`), including `Upgrade`/`Connection` headers for the HMR websocket. First step: confirm the nginx container can actually reach a dev server running on the host (see Open Question 2 in the plan).
 
 **Acceptance criteria:**
-- [ ] `default.conf` has two `location` blocks: `/` and `/api/`
-- [ ] Websocket upgrade headers present on the `/` location
-- [ ] `/api/` `proxy_pass` targets the Fastify compose service name and strips the `/api` prefix
-- [ ] `/` `proxy_pass` targets `host.docker.internal` (the host's dev server), not a compose service
-- [ ] Reachability of a host service from a throwaway nginx container is confirmed (or the fallback noted in the plan is applied)
+- [x] `default.conf` has two `location` blocks: `/` and `/api/`
+- [x] Websocket upgrade headers present on the `/` location
+- [x] `/api/` `proxy_pass` targets the Fastify compose service name and strips the `/api` prefix
+- [x] `/` `proxy_pass` targets `host.docker.internal` (the host's dev server), not a compose service
+- [x] Reachability of a host service from a throwaway nginx container is confirmed (or the fallback noted in the plan is applied)
 
 **Verification:**
-- [ ] Manual: `nginx -t` syntax check via a throwaway `nginx:alpine` container mounting the config, with `--add-host` entries so the upstream names resolve (full behavioral verification happens in Task 4)
+- [x] Manual: `nginx -t` syntax check via a throwaway `nginx:alpine` container mounting the config, with `--add-host` entries so the upstream names resolve (full behavioral verification happens in Task 4)
 
 **Dependencies:** Task 2
+
+**Result (Oct 19, 2026):** Host reachability confirmed on Colima: a container with `--add-host host.docker.internal:host-gateway` reached a throwaway server on host port 3001 (HTTP 200), bound to `127.0.0.1` and to `0.0.0.0` alike, so no dev-server bind change is needed. `nginx -t` failed (exit 1, `host not found in upstream "fastify"`) without the `--add-host` entries and passed (exit 0) with them, using `nginx:1.31.7-alpine3.24`. Prefix stripping and the websocket are verified end to end in Task 4.
 
 **Files likely touched:**
 - `docker/nginx/default.conf`
