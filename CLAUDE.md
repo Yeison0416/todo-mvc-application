@@ -55,7 +55,7 @@ See `server/README.md` for the layer's architecture, tools and troubleshooting.
 
 ## Git workflow
 
-Follow `.claude/skills/git-workflow-and-versioning`.
+Follow the `git-workflow-and-versioning` skill.
 
 - Before new work: fetch, fast-forward `main`, then branch from it (`feature/<short-description>`, `fix/…`, `chore/…`). Never work directly on `main`.
 - Atomic commits, one logical change each: `<type>: <description>` with types `feat`, `fix`, `refactor`, `test`, `docs`, `chore`.

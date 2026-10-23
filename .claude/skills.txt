@@ -1,0 +1,4 @@
+# Project-level skills for this repo, linked from the agent-skills fork (the links are not committed).
+# Link them with:
+#   ~/Documents/Yeison/AI-Assisted/AI-Frameworks/Addy-Osmani/agent-skills/yeison/install.sh --target .claude/skills --manifest .claude/skills.txt
+frontend-ui-engineering   # ~110 tokens
