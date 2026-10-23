@@ -20,7 +20,7 @@ Root (the frontend):
 ```
 npm test                 # Jest (ts-jest, jsdom); tests live in src/**/*.test.ts (none written yet)
 npm run type-check       # tsc --noEmit
-npm start                # webpack serve --open on port 8080, plus type-check:watch
+npm start                # webpack serve on port 3001, opens http://localhost:8080 (the nginx proxy), plus type-check:watch
 npm run build            # type-check + production webpack build
 npm run format:check     # prettier --check . (npm run format to fix)
 ```
@@ -82,6 +82,6 @@ Follow `.claude/skills/git-workflow-and-versioning`.
 - Colima shares only the home directory with its VM. A bind mount or copy under `/tmp` is invisible to containers.
 - Bind-mounted host folders on macOS do not deliver file-change events to containers, so watchers need polling. This is why the frontend dev server runs on the host, not in a container.
 - webpack-dev-server injects its own listening port into the HMR client. Behind a proxy or a remapped port the browser dials the wrong port unless told otherwise (`--client-web-socket-url-port 0`).
-- `npm start` passes `--open` and cannot take extra arguments, so it can't be reused unchanged in a container.
+- The dev server's `open` target is set in `webpack.dev.js` (`http://localhost:8080`, the proxy). Do not add `--open` back to the `start` script: the bare flag overrides the config and opens `localhost:3001`, which skips nginx (`/api` then 404s).
 - `docker build .` sends the whole folder as context. The root `.dockerignore` keeps `node_modules` out, and without it the build hangs.
 - `.nvmrc` says v21.6.1, which Jest 30 does not support. The project builds and runs on Node 24.

@@ -1,0 +1,21 @@
+services:
+    nginx:
+        # Pinned 2026-10-19: nginx 1.31.7 on Alpine 3.24 (the tag behind `nginx:alpine` that day).
+        # Explicit tag on purpose: no floating aliases (see SPEC-dev-infra.md, Boundaries).
+        image: nginx:1.31.7-alpine3.24
+        ports:
+            # The only published port: the single entry point for the app and the API.
+            - '8080:80'
+        volumes:
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+        extra_hosts:
+            # Lets nginx reach the frontend dev server running on the host, on any platform.
+            - 'host.docker.internal:host-gateway'
+        depends_on:
+            - fastify
+
+    fastify:
+        build:
+            context: .
+            dockerfile: docker/fastify/Dockerfile
+        # No `ports:` on purpose: Fastify is reachable only through nginx, on the compose network.

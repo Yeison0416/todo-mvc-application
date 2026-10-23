@@ -37,10 +37,10 @@ This is a hybrid setup: the backend infrastructure is containerized, and the fro
 | ------------------------------------------- | --------------------- |
 | Fastify API skeleton (`server/`)            | Included and verified |
 | Fastify container image (`docker/fastify/`) | Included and verified |
-| nginx reverse proxy                         | Not included yet      |
-| Docker Compose file (nginx + Fastify)       | Not included yet      |
+| nginx reverse proxy (`docker/nginx/`)       | Included and verified |
+| Docker Compose file (nginx + Fastify)       | Included and verified |
 
-Today only the Fastify API exists. It runs either directly on your machine or inside a container, and both are verified. The proxy and Compose are not built yet, so `localhost:8080` does not work yet.
+Start the infrastructure with `docker compose up --build`, then the frontend with `npm start` (it opens `http://localhost:8080`). The Fastify API also still runs directly on your machine or in a standalone container.
 
 The frontend dev server is not part of the layer. It runs on your machine and is started with the frontend's own dev command.
 
@@ -49,11 +49,11 @@ The frontend dev server is not part of the layer. It runs on your machine and is
 For the layer to work, the frontend dev server must:
 
 1. **Run on the host** on a port other than 8080, because nginx owns 8080 (this repo uses 3001).
-2. **Be reachable from the nginx container** through `host.docker.internal`. This may require the dev server to listen on all interfaces and not only `localhost`. This is not verified yet.
+2. **Be reachable from the nginx container** through `host.docker.internal`. On Colima this works even when the dev server listens on `localhost` only.
 3. **Accept the proxied `Host` header** (`localhost:8080`). nginx forwards the original host.
 4. **Make its hot-reload client connect to the page's origin,** so the websocket goes through nginx. Dev servers inject their own listening port into the client by default, which breaks behind a proxy (webpack: `--client-web-socket-url-port 0`, Vite: `server.hmr.clientPort`).
 
-Any dev server that meets these four points fits, whichever bundler it is. Neither webpack nor Vite has been verified against the finished layer yet.
+Any dev server that meets these four points fits, whichever bundler it is. webpack has been verified against the finished layer; Vite has not.
 
 ## What's in the layer
 
@@ -67,6 +67,8 @@ server/
   README.md           this document
 docker/
   fastify/Dockerfile  recipe for the Fastify container image
+  nginx/default.conf  proxy rules: / to the host dev server, /api/ to Fastify
+docker-compose.yml    starts nginx and Fastify
 .dockerignore         files Docker should not send when building
 ```
 

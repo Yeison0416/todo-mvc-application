@@ -85,20 +85,23 @@
 **Description:** Create `docker-compose.yml` defining the two services (nginx, fastify), publishing only nginx's port (8080) to the host; fastify is reachable only on the internal compose network. nginx gets `extra_hosts: host.docker.internal:host-gateway` so it can reach the frontend dev server on the host on any platform. The frontend dev server is started separately on the host.
 
 **Acceptance criteria:**
-- [ ] `docker compose up --build` starts both containers successfully
-- [ ] With the frontend dev server running on the host, `http://localhost:8080/` serves the frontend app
-- [ ] Editing a frontend source file triggers HMR through the proxy, with no failed `ws://` connections in the browser console
-- [ ] `http://localhost:8080/api/health` returns `{"status":"ok"}`
-- [ ] `docker compose ps` shows only nginx's port published
+- [x] `docker compose up --build` starts both containers successfully
+- [x] With the frontend dev server running on the host, `http://localhost:8080/` serves the frontend app
+- [x] Editing a frontend source file triggers HMR through the proxy, with no failed `ws://` connections in the browser console
+- [x] `http://localhost:8080/api/health` returns `{"status":"ok"}`
+- [x] `docker compose ps` shows only nginx's port published
 
 **Verification:**
-- [ ] Manual: `docker compose up --build`; start the frontend on the host; browser checks above; `docker compose ps`
+- [x] Manual: `docker compose up --build`; start the frontend on the host; browser checks above; `docker compose ps`
 
 **Dependencies:** Tasks 1–3
 
+**Result (Oct 19–20, 2026):** `docker compose up --build` started both containers; `docker compose ps` showed only nginx's `0.0.0.0:8080->80` published (Fastify `3000/tcp` internal; host port 3000 refused connections). `/api/health` through nginx returned 200 `{"status":"ok"}`; `/` and `/app.bundle.js` returned 200 through nginx; the websocket handshake through nginx returned `101 Switching Protocols`. The developer confirmed in the browser (Oct 20): no console errors, and editing a source file updates the page. Frontend change (approved by the developer): `webpack.dev.js` `devServer` now sets `port: 3001`, `open: 'http://localhost:8080'` and `client.webSocketURL.port: 0`; `--open` was removed from the `start` script (the bare flag overrides the config and would open `localhost:3001`, skipping nginx). The first webpack compile takes ~35 s and holds requests until it finishes, so an early request through nginx can time out.
+
 **Files likely touched:**
 - `docker-compose.yml`
-- the frontend's dev server config or start command, to move it to port 3001 and point its HMR client at the page's origin (ask first, per the spec)
+- `webpack.dev.js` and the `start` script in `package.json` (port 3001, HMR client on the page's origin, auto-open on 8080; approved by the developer)
+- `CLAUDE.md` and `server/README.md` (stale statements corrected)
 
 **Estimated scope:** S (1–2 files)
 
@@ -106,5 +109,5 @@
 
 ## Checkpoint: Complete
 - [ ] All Success Criteria in `SPEC-dev-infra.md` met
-- [ ] No CORS errors in browser console
+- [x] No CORS errors in browser console (confirmed by the developer, Oct 20)
 - [ ] Ready for review before starting the `failure-simulation-api` module

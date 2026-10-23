@@ -29,14 +29,14 @@ Stand up a Docker Compose environment — nginx and a Fastify skeleton in contai
 
 ### Phase 2: Reverse proxy and composition
 - [x] Task 3: nginx reverse proxy config
-- [ ] Task 4: `docker-compose.yml` wiring + end-to-end verification
+- [x] Task 4: `docker-compose.yml` wiring + end-to-end verification
 
 ### Checkpoint: Complete
-- [ ] `docker compose up --build` starts both services (nginx, fastify)
-- [ ] The frontend dev server runs on the host and is reachable through `http://localhost:8080/` with working HMR
-- [ ] `http://localhost:8080/api/health` returns `{"status":"ok"}`
-- [ ] Only nginx's port is published (`docker compose ps`)
-- [ ] No CORS errors in browser console
+- [x] `docker compose up --build` starts both services (nginx, fastify)
+- [x] The frontend dev server runs on the host and is reachable through `http://localhost:8080/` with working HMR (confirmed in the browser by the developer, Oct 20)
+- [x] `http://localhost:8080/api/health` returns `{"status":"ok"}`
+- [x] Only nginx's port is published (`docker compose ps`)
+- [x] No CORS errors in browser console
 - [ ] Review with human before starting `failure-simulation-api`
 
 ## Risks and Mitigations
@@ -62,7 +62,7 @@ None open.
 ## Decisions
 
 - **nginx image: `nginx:1.31.7-alpine3.24`** (Oct 19, 2026), the explicit tag behind `nginx:alpine`. There is no nginx Dockerfile, so the pin goes in `docker-compose.yml` (Task 4) with a dated comment.
-- **Frontend dev server port: 3001** (developer, Oct 19, 2026). nginx keeps 8080. Applying it means touching the frontend's dev server config or start command, which the spec lists as "ask first"; it happens in Task 4, with review.
+- **Frontend dev server port: 3001** (developer, Oct 19, 2026). nginx keeps 8080. Applying it touched the frontend's dev server config and start command, which the spec lists as "ask first"; done in Task 4 with the developer's approval (Oct 19): `port: 3001`, `client.webSocketURL.port: 0` and `open: 'http://localhost:8080'` in `webpack.dev.js`, and `--open` removed from the `start` script. The developer chose a single command (`npm start`) over a separate `start:proxied` script, and kept auto-open pointed at the proxy.
 
 ## Scope changes
 
