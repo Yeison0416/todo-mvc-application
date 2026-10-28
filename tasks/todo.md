@@ -110,4 +110,6 @@
 ## Checkpoint: Complete
 - [ ] All Success Criteria in `SPEC-dev-infra.md` met
 - [x] No CORS errors in browser console (confirmed by the developer, Oct 20)
-- [ ] Ready for review before starting the `failure-simulation-api` module
+- [x] Ready for review before starting the `failure-simulation-api` module (developer, Oct 27, 2026)
+
+**Review (Oct 27, 2026):** the README "Getting started" steps were followed in a fresh public clone: `npm install` (23 s, lockfile untouched), `npm run type-check`, `docker compose up --build` (only nginx's port 8080 published; Fastify not reachable from the host), `/api/health` through nginx returned 200, the page and bundle through nginx returned 200, the HMR websocket handshake returned 101, and `/` returned the expected 502 before the dev server was started. Findings fixed: the old README getting-started and usage text, and `.nvmrc` aligned to Node 24. The first box stays open: it can only be confirmed by building `failure-simulation-api` on this skeleton without touching nginx or compose.
