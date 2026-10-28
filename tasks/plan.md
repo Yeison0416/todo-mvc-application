@@ -37,7 +37,7 @@ Stand up a Docker Compose environment — nginx and a Fastify skeleton in contai
 - [x] `http://localhost:8080/api/health` returns `{"status":"ok"}`
 - [x] Only nginx's port is published (`docker compose ps`)
 - [x] No CORS errors in browser console
-- [ ] Review with human before starting `failure-simulation-api`
+- [x] Review with human before starting `failure-simulation-api` (developer, Oct 27, 2026)
 
 ## Risks and Mitigations
 
@@ -47,7 +47,7 @@ Stand up a Docker Compose environment — nginx and a Fastify skeleton in contai
 | HMR websocket doesn't survive the nginx proxy, or the HMR client dials the dev server's own port instead of the page's origin | Medium — dev experience degrades to manual refresh, console shows failed `ws://localhost:<port>/ws` | Treat HMR as an explicit acceptance criterion in Task 4; `Upgrade`/`Connection` headers built into Task 3 from the start; the frontend contract requires the HMR client to use the page's origin (webpack `--client-web-socket-url-port 0`, Vite `server.hmr.clientPort`) |
 | Port clash: the host dev server defaults to 8080, the same port nginx publishes | Medium — one of them fails to start | Frontend dev server moves to port 3001 (decided Oct 19, 2026); nginx keeps 8080 per the spec |
 | nginx config check fails standalone because the upstream hostnames (`fastify`, `host.docker.internal`) don't resolve outside compose | Low | Run the Task 3 check with `--add-host` entries for both names, or inside the compose network |
-| Frontend toolchain is no longer containerized, so it depends on the host's Node version (`.nvmrc` says v21.6.1, which Jest 30 does not support) | Low–Medium — works on one machine, breaks on another | Out of scope for this module; fix `.nvmrc` to the supported Node version separately |
+| Frontend toolchain is no longer containerized, so it depends on the host's Node version (`.nvmrc` said v21.6.1, which Jest 30 does not support) | Low–Medium — works on one machine, breaks on another | Resolved Oct 27, 2026: `.nvmrc` now says `24` (the Docker image and the README use Node 24 too) |
 | Pinned "latest Node" tag goes stale | Low | Tag is explicit and dated in the Dockerfile comment; revisited if a future module needs a newer feature |
 | Host port 8080 conflicts with another local process | Low | Document the port in README; make it overridable via `docker-compose.override.yml` if it becomes a real problem |
 
