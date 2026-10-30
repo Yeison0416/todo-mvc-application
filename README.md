@@ -109,4 +109,4 @@ Open **http://localhost:8080**, not `http://localhost:3001`. The page also loads
 | `npm run type-check` | Runs the TypeScript check only                                                       |
 | `npm test`           | Runs the Jest tests. There are none yet, so it currently stops with "no tests found" |
 
-For how Docker, Docker Compose, nginx, Fastify and the frontend dev server are wired together, see [`docker/README.md`](docker/README.md). For the backend layer's goals, tools and troubleshooting, see [`server/README.md`](server/README.md).
+For how Docker, Docker Compose, nginx, Fastify and the frontend dev server are wired together, see [`docker/README.md`](docker/README.md). For the backend layer's goals, tools and troubleshooting, see [`server/docs/infrastructure.md`](server/docs/infrastructure.md). To run only the server and its tests, see [`server/README.md`](server/README.md).

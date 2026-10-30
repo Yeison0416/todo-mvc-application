@@ -59,12 +59,15 @@ Any dev server that meets these four points fits, whichever bundler it is. webpa
 
 ```
 server/
-  src/index.ts        Fastify app: one route, GET /health
+  src/app.ts          buildApp(): the Fastify instance and its routes, without listening
+  src/index.ts        starts the app on port 3000
+  test/               Jest tests
   package.json        dependencies and scripts (separate from the frontend's)
   package-lock.json   exact versions of every installed package
   tsconfig.json       TypeScript settings (strict mode)
   .npmrc              tells npm to use the public registry
-  README.md           this document
+  README.md           short getting started for the server
+  docs/infrastructure.md  this document
 docker/
   fastify/Dockerfile  recipe for the Fastify container image
   nginx/default.conf  proxy rules: / to the host dev server, /api/ to Fastify

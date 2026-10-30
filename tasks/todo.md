@@ -192,7 +192,7 @@
 - [ ] Manual: `curl -i -H 'X-Simulate-Failure: <value>' http://localhost:8080/api/app-config` per value; `docker ps` first, to avoid touching containers that are not ours
 
 **Dependencies:** Task 7
-**Files likely touched:** `tasks/todo.md` (results), `server/README.md` (usage of the header)
+**Files likely touched:** `tasks/todo.md` (results), `server/README.md` (usage of the header) and `server/docs/infrastructure.md` if the explanation changes
 **Estimated scope:** XS
 
 ---
