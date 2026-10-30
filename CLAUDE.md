@@ -32,7 +32,7 @@ Follow the `git-workflow-and-versioning` skill, plus:
 - Fetch and fast-forward `main` before new work, then branch (`feature/<short-description>`, `fix/…`, `chore/…`). Never work directly on `main`.
 - Commits: `<type>: <description>` with types `feat`, `fix`, `refactor`, `test`, `docs`, `chore`.
 - **Commit and push only when the developer asks.** Never merge. Never force-push.
-- PR template: `.github/pull_request_template.md`. `gh` is not authenticated for github.com here, so give the developer the compare link and a filled-in description to open the PR themselves.
+- PR template: `.github/pull_request_template.md`. `gh` works here: when the developer asks, push the branch and open the PR with `gh pr create`, filling in the template. Never merge it.
 
 ## How we work
 
