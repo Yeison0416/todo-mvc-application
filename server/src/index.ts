@@ -1,8 +1,6 @@
-import Fastify from 'fastify';
+import { buildApp } from './app';
 
-const app = Fastify({ logger: true });
-
-app.get('/health', async () => ({ status: 'ok' }));
+const app = buildApp();
 
 app.listen({ port: 3000, host: '0.0.0.0' }, (err) => {
     if (err) {
