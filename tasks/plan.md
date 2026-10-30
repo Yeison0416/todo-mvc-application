@@ -71,3 +71,8 @@ The original plan containerized webpack-dev-server with the source bind-mounted 
 
 - Old Task 3 (Dockerize webpack-dev-server) was dropped, and the remaining tasks were renumbered: old Task 4 (nginx) is now Task 3, old Task 5 (compose) is now Task 4.
 - The work done for it lives only on the unmerged branch `feature/dockerize-webpack-dev-server` and is not part of the module.
+
+**Oct 29, 2026 — `failure-simulation-api` starts (no change to `dev-infra` scope).**
+The spec [`SPEC-failure-simulation-api.md`](../docs/specs/SPEC-failure-simulation-api.md) was approved by the developer. Its tasks are in `tasks/todo.md` under "Module: failure-simulation-api". The `dev-infra` tasks above are unchanged; the open "All Success Criteria met" box in `tasks/todo.md` closes when that module's last task is verified without any diff in `docker/` or `docker-compose.yml`.
+
+Decisions (developer, Oct 29, 2026): Fastify emits the infra-style failures itself (`network` = socket destroy, so nginx returns its own 502); header `X-Simulate-Failure`; endpoint `GET /app-config`; Jest + `app.inject()` in `server/`; the 15 s simulated timeout is a constant, and the Axios timeout value is owned by `http-client` (invariant recorded in the spec).

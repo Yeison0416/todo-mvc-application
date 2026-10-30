@@ -113,3 +113,89 @@
 - [x] Ready for review before starting the `failure-simulation-api` module (developer, Oct 27, 2026)
 
 **Review (Oct 27, 2026):** the README "Getting started" steps were followed in a fresh public clone: `npm install` (23 s, lockfile untouched), `npm run type-check`, `docker compose up --build` (only nginx's port 8080 published; Fastify not reachable from the host), `/api/health` through nginx returned 200, the page and bundle through nginx returned 200, the HMR websocket handshake returned 101, and `/` returned the expected 502 before the dev server was started. Findings fixed: the old README getting-started and usage text, and `.nvmrc` aligned to Node 24. The first box stays open: it can only be confirmed by building `failure-simulation-api` on this skeleton without touching nginx or compose.
+
+---
+
+# Module: failure-simulation-api
+
+> Spec: [`docs/specs/SPEC-failure-simulation-api.md`](../docs/specs/SPEC-failure-simulation-api.md) (approved Oct 29, 2026). Plan note: `tasks/plan.md`, "Scope changes".
+> Work in `server/` only. No change to `docker/`, `docker-compose.yml` or the root `package.json`.
+
+## Task 5: Test tooling and `buildApp()` split
+
+**Description:** Add Jest and `ts-jest` to `server/` (public registry only), a `test` script and `jest.config.js`. Move the Fastify instance and `/health` into `src/app.ts` as `buildApp()`; `src/index.ts` only calls `listen()`. Write a first test for `/health` through `app.inject()`.
+
+**Acceptance criteria:**
+- [ ] `server/package.json` has `jest`, `ts-jest`, `@types/jest` as devDependencies and an `npm test` script
+- [ ] `buildApp()` exported from `src/app.ts`; `index.ts` only starts it
+- [ ] `grep -c nexus server/package-lock.json` prints `0`
+
+**Verification:**
+- [ ] RED: the `/health` test fails before `buildApp()` exists; GREEN: it passes after
+- [ ] `cd server && npm test` and `npm run type-check` exit 0; `npm run dev` still serves `/health`
+
+**Dependencies:** None
+**Files likely touched:** `server/package.json`, `server/package-lock.json`, `server/jest.config.js`, `server/src/app.ts`, `server/src/index.ts`, `server/test/app.test.ts`
+**Estimated scope:** S
+
+---
+
+## Task 6: `FailureReason` type and factories
+
+**Description:** `failure/failureReason.ts` with the `FailureReason` type and one factory per category producing the `code`, `httpStatus`, `message`, `retryable` and ISO `timestamp` from the spec table (including the invalid-header 400).
+
+**Acceptance criteria:**
+- [ ] Each factory matches its row in the spec table, with no extra fields
+- [ ] `timestamp` is a valid ISO string; `message` is UI-safe
+
+**Verification:**
+- [ ] RED then GREEN: Jest tests per category (with a fixed clock)
+
+**Dependencies:** Task 5
+**Files likely touched:** `server/src/failure/failureReason.ts`, `server/test/failure/failureReason.test.ts`
+**Estimated scope:** S
+
+---
+
+## Task 7: Simulation dispatch and `GET /app-config`
+
+**Description:** `failure/simulate.ts` maps the `X-Simulate-Failure` value to a behaviour (JSON failure, 15 s delay for `timeout`, socket destroy for `network`, 400 for an unrecognized value). `config/appConfig.ts` holds the success payload. `routes/appConfig.ts` wires them, registered in `buildApp()`.
+
+**Acceptance criteria:**
+- [ ] Absent and `success` return 200 `{ appName: 'TodoMVC', version: '1.0.0' }`
+- [ ] `server`, `validation`, `unknown` and an unrecognized value return the spec's status and `FailureReason` body
+- [ ] `timeout` waits 15 s (constant) before responding; `network` destroys the socket
+- [ ] The header is read only in the app-config route
+
+**Verification:**
+- [ ] RED then GREEN: `inject()` tests for every row; `timeout` with fake timers
+- [ ] `network` is not observable via `inject()`: covered in Task 8
+
+**Dependencies:** Task 6
+**Files likely touched:** `server/src/failure/simulate.ts`, `server/src/config/appConfig.ts`, `server/src/routes/appConfig.ts`, `server/src/app.ts`, tests under `server/test/`
+**Estimated scope:** M
+
+---
+
+## Task 8: End-to-end check through nginx
+
+**Description:** With `docker compose up --build`, exercise all six header values via `http://localhost:8080/api/app-config`, and confirm the module needed no infra change.
+
+**Acceptance criteria:**
+- [ ] All six values (plus an unrecognized one) behave per the spec table through nginx; `network` shows a 502 from nginx; `timeout` hangs about 15 s
+- [ ] `/api/health` still returns `{"status":"ok"}`
+- [ ] `git diff main -- docker docker-compose.yml package.json` is empty
+
+**Verification:**
+- [ ] Manual: `curl -i -H 'X-Simulate-Failure: <value>' http://localhost:8080/api/app-config` per value; `docker ps` first, to avoid touching containers that are not ours
+
+**Dependencies:** Task 7
+**Files likely touched:** `tasks/todo.md` (results), `server/README.md` (usage of the header)
+**Estimated scope:** XS
+
+---
+
+## Checkpoint: failure-simulation-api complete
+- [ ] All Success Criteria in `SPEC-failure-simulation-api.md` met
+- [ ] Then tick the open "All Success Criteria met" box in the `dev-infra` checkpoint above, with a note
+- [ ] Review with the developer before starting `http-client`
