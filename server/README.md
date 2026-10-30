@@ -22,6 +22,7 @@ To run it behind nginx together with the frontend, use `docker compose up --buil
 ```bash
 npm test             # Jest unit tests; they call the app in memory, with no server or Docker
 npm run type-check   # TypeScript check, no output files
+npm run test:coverage   # tests plus a coverage report; fails below 90%. Open coverage/index.html in a browser
 ```
 
 ## Layout

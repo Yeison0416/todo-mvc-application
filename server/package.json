@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
         "type-check": "tsc --noEmit",
-        "test": "jest"
+        "test": "jest",
+        "test:coverage": "jest --coverage"
     },
     "dependencies": {
         "fastify": "^5.12.5"
