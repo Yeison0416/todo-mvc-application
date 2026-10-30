@@ -16,7 +16,7 @@ Re-run a task's verification when its baseline is missing, the code has moved, o
 ## Commands
 
 - `npm start`: webpack on port 3001, opens http://localhost:8080 (the nginx proxy), plus type-check:watch. Never add `--open` to this script (see `docs/gotchas.md`). Other scripts are in `package.json`; there is no lint script (ESLint and Stylelint run through the webpack plugins).
-- Backend layer (Fastify in `server/`, nginx, `docker compose up --build`, Colima): see `server/README.md`.
+- Backend layer (Fastify in `server/`, nginx, `docker compose up --build`, Colima): see `server/README.md` (quick start) and `server/docs/infrastructure.md` (full explanation).
 
 ## Conventions
 

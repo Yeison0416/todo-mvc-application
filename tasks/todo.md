@@ -126,16 +126,18 @@
 **Description:** Add Jest and `ts-jest` to `server/` (public registry only), a `test` script and `jest.config.js`. Move the Fastify instance and `/health` into `src/app.ts` as `buildApp()`; `src/index.ts` only calls `listen()`. Write a first test for `/health` through `app.inject()`.
 
 **Acceptance criteria:**
-- [ ] `server/package.json` has `jest`, `ts-jest`, `@types/jest` as devDependencies and an `npm test` script
-- [ ] `buildApp()` exported from `src/app.ts`; `index.ts` only starts it
-- [ ] `grep -c nexus server/package-lock.json` prints `0`
+- [x] `server/package.json` has `jest`, `ts-jest`, `@types/jest` as devDependencies and an `npm test` script
+- [x] `buildApp()` exported from `src/app.ts`; `index.ts` only starts it
+- [x] `grep -c nexus server/package-lock.json` prints `0`
 
 **Verification:**
-- [ ] RED: the `/health` test fails before `buildApp()` exists; GREEN: it passes after
-- [ ] `cd server && npm test` and `npm run type-check` exit 0; `npm run dev` still serves `/health`
+- [x] RED: the `/health` test fails before `buildApp()` exists; GREEN: it passes after
+- [x] `cd server && npm test` and `npm run type-check` exit 0; `npm run dev` still serves `/health`
+
+**Result (Oct 29, 2026):** RED: with the test and config in place, `npm test` failed with `Cannot find module '../src/app'` (a first run failed for the wrong reason, missing jest types in `tsconfig.json`, and was fixed before counting). GREEN: 1 test passed after `buildApp()` existed. `npm test` and `npm run type-check` exit 0; `grep -c nexus server/package-lock.json` prints 0; `npm run dev` served `{"status":"ok"}` (200) on port 3000. Installed: jest 30.5.2, ts-jest 29.4.15, @types/jest 30.0.0. `server/tsconfig.json` also changed: `rootDir` `.`, `include` adds `test/**/*`, `types: [node, jest]`, `isolatedModules: true` (Node16 modules need it under ts-jest).
 
 **Dependencies:** None
-**Files likely touched:** `server/package.json`, `server/package-lock.json`, `server/jest.config.js`, `server/src/app.ts`, `server/src/index.ts`, `server/test/app.test.ts`
+**Files likely touched:** `server/package.json`, `server/package-lock.json`, `server/jest.config.js`, `server/src/app.ts`, `server/src/index.ts`, `server/test/app.test.ts`, `server/tsconfig.json`
 **Estimated scope:** S
 
 ---
@@ -190,7 +192,7 @@
 - [ ] Manual: `curl -i -H 'X-Simulate-Failure: <value>' http://localhost:8080/api/app-config` per value; `docker ps` first, to avoid touching containers that are not ours
 
 **Dependencies:** Task 7
-**Files likely touched:** `tasks/todo.md` (results), `server/README.md` (usage of the header)
+**Files likely touched:** `tasks/todo.md` (results), `server/README.md` (usage of the header) and `server/docs/infrastructure.md` if the explanation changes
 **Estimated scope:** XS
 
 ---
